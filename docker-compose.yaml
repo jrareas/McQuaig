@@ -1,14 +1,53 @@
 version: '2'
 services:
-   pyramid:
-     build:
-        context: ./
-        dockerfile: ./Dockerfile 
-     working_dir: /app
-     ports:
-        - '81:81'
-     volumes:
-       - './docker/base/:/app'
-     environment:
-       - PATHS_FROM_ECLIPSE_TO_PYTHON=[["/Users/jareas/Developer/ja-docker-images/python_container/docker/base","/app"]]
-         
+    mcquaig:
+        build:
+            context: ./
+            dockerfile: ./Dockerfile 
+        working_dir: /app
+        ports:
+            - '5001:5001'
+        volumes:
+            - './python_app/:/app'
+        environment:
+            - PATHS_FROM_ECLIPSE_TO_PYTHON=[["/Users/jareas/Developer/ja-docker-images/McQuaig/python_app","/app"]]
+            - mysql_user=mcquaig
+            - mysql_pass=mcquaig
+            - mysql_host=mysql
+            - mysql_port=3306
+            - mysql_db=mcquaig
+        depends_on:
+          - mysql
+          - email
+    email:
+        platform: linux/x86_64
+        image: ubuntu:20.04
+        volumes:
+            - './:/app'
+        #command: chmod +x /app/emailer-linux; /app/emailer-linux
+        command: tail -f /dev/null
+        working_dir: "/app"
+        ports:
+            - "80:3030"
+    mysql:
+        platform: linux/x86_64
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_DATABASE: 'mcquaig'
+            # So you don't have to use root, but you can if you like
+            MYSQL_USER: 'mcquaig'
+            # You can use whatever password you like
+            MYSQL_PASSWORD: 'mcquaig'
+            # Password for root access
+            MYSQL_ROOT_PASSWORD: 'mcquaig'
+        ports:
+            # <Port exposed> : < MySQL Port running inside container>
+            - '3306:3306'
+        expose:
+            # Opens port 3306 on the container
+            - '3306'
+        volumes:
+            - ./my-db:/var/lib/mysql
+        cpu_shares: 128
+        mem_limit: 1024m

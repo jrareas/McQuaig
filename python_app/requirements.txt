@@ -1,0 +1,12 @@
+pyramid==2.0
+alembic
+Paste
+jinja2
+pyramid_jinja2
+pydevd
+sqlalchemy
+pymysql
+pytest
+requests
+mypy
+asbool

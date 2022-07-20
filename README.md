@@ -1,32 +1,48 @@
 **RUN it locally**
 
-The command below from the root folder will build the base docker and up
+This application requires docker to run. Make sure you have it installed before moving forward. It will also use an external docker image for the DB engine. To run the application locally, navigate to the project root folder and run the command below:
 
-`make build-base`
+`docker-compose up`
 
-The command below will push base to the repo
+You should see the docker image build locally and the server will be up on port 5001(had to change as 5000 is already a taken port on mac environments)  
 
-`make push-base`
-
-This will change though
 
 **DEBUG**
 make sure the map is set in your yaml file. Example:
 
 `- PATHS_FROM_ECLIPSE_TO_PYTHON=[["/Users/jareas/Developer/ja-docker-images/python_container/docker/base","/app"]]`
 
+***Bash to container***
+The services in the docker compose file are as follow:
+- mcquaig
+- mysql
+
+when fired up, the containers name's will be:
+
+mcquaig-mcquaig-1
+mcquaig-mysql-1
+
+to bash into the containers you will run:
+` docker exec -ti mcquaig-mysql-1 bash`
+` docker exec -ti mcquaig-mcquaig-1 bash`
+
+***Tests***
+To run the tests, the script expects that the containers are running. With the containers up and running, run the command as below:
+
+- from a linux/mac machine
+```
+cd 'path to tests folders'
+./run.sh
+```
+
+You can also bash into the container and run:
+`pytest` 
+
 ***Migrations**
-from the root folder run
+from within the container bash run as below
 
-Creating:
-
-`alembic revision -m "create account table"`
-
-running:
-
+upgrading:
 
 `alembic -c development.ini upgrade head`
 
-Rollback to Scratch:
 
-`alembic -c development.ini downgrade base`
